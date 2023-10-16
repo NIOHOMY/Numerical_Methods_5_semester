@@ -129,6 +129,14 @@
   <ItemGroup>
     <ClCompile Include="Sourse.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="13.txt" />
+    <Text Include="results.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Matrix.h" />
+    <ClInclude Include="Utils.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
