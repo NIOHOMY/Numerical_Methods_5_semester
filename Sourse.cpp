@@ -116,7 +116,45 @@ public:
             }
         }
 
-        std::vector<double> x(N);
+        // решение Uy=f
+        std::vector<double> y;
+        y.resize(N); y.reserve(N);
+        for (int i = N-1; i >= 0; --i)
+        {
+            double sum = 0;
+            for (int j = 0; j < L-1; j++)
+            {
+                if (i + j + 1 < N)
+                {
+                    sum += y[i + j + 1]* matrix[i][L + j];
+                }
+                /*else
+                {
+                    sum += matrix[i][L + j];
+                }*/
+            }
+            y[i] = b[i] - sum;
+            std::cout << y[i]<<" , ";
+        }
+        
+        // решение Lx=y
+        std::vector<double> x(N); x.reserve(N);
+        
+        for (int i = 0; i <N; ++i)
+        {
+            double sum = 0;
+            for (int j = 0; j < L - 1; j++)
+            {
+                if (i - j - 1 >= 0)
+                {
+                    sum += y[i - j - 1]* matrix[i][L - j - 2];
+                }
+                /*else {
+                    sum += matrix[i][L - j - 2];
+                }*/
+            }
+            x[i] = (y[i] - sum)/matrix[i][L-1];
+        }
         // Выводим решение
         std::cout << "Решение СЛАУ:" << std::endl;
         for (int i = 0; i < N; ++i) {
@@ -127,10 +165,10 @@ public:
 
 int main() {
     std::string filename = "matrix.txt";
-    int N = 6; // Размер обычной матрицы
-    int L = 4; // Половина ширины ленты
+    int N = 10; // Размер обычной матрицы
+    int L = 3; // Половина ширины ленты
 
-    std::vector<double> b = { 1.0, 2.0, 3.0, 4.0, 5.0 }; // Вектор b в СЛАУ Ax=b
+    std::vector<double> b = { 1.0, 2.0, 3.0, 4.0, 5.0, 1.0, 2.0, 3.0, 4.0, 5.0 }; // Вектор b в СЛАУ Ax=b
 
     LentochnayaMatrix lenta(filename, N, L);
     lenta.PrintMatrix();
