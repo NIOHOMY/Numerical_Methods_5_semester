@@ -55,6 +55,7 @@ public:
         }
         for (size_t i = 1; i < N; i++)
         {
+            PrintMatrix();
             // col_v with w
             int newUpLine = i-1;
             int newUpCol = L;
@@ -67,17 +68,16 @@ public:
             {
                 newUpLine = i - 1;
                 newUpCol = L;
-                newLeftLine = i;
+                newLeftLine = i+k;
                 newLeftCol = new_v;
                 sum = 0;
                 for (size_t j = 0; j < L-1; j++)
                 {
-                    if (newUpLine>=0 && newUpCol >= 0 && newLeftLine >= 0 && newLeftCol >= 0)
+                    if ((newUpLine >= 0 && newUpLine < N) && newUpCol >= 0 && newUpCol <= 2 * L - 2 && newLeftLine >= 0 && newLeftLine <N && newLeftCol >= 0 && newLeftCol <= 2 * L - 2)
                     {
                         sum += (matrix[newUpLine][newUpCol] * matrix[newLeftLine][newLeftCol]);
                         newUpLine -= 1;
                         newUpCol += 1;
-                        newLeftLine += 1;
                         newLeftCol -= 1;
                     }
                 }
@@ -93,13 +93,13 @@ public:
             for (size_t k = 0; k < L-1; k++)
             {
                 newUpLine = i - 1;
-                newUpCol = L+1;
+                newUpCol = new_v+1;
                 newLeftLine = i;
                 newLeftCol = L - 2;
                 sum = 0;
                 for (size_t j = 0; j < L - 1; j++)
                 {
-                    if ((newUpLine >= 0 && newUpLine <= 2*L-2)&& newUpCol >= 0 && newUpCol <= 2 * L - 2 && newLeftLine >= 0 && newLeftLine <= 2 * L - 2 && newLeftCol >= 0 && newLeftCol <= 2 * L - 2)
+                    if ((newUpLine >= 0 && newUpLine < N)&& newUpCol >= 0 && newUpCol <= 2 * L - 2 && newLeftLine >= 0 && newLeftLine <N && newLeftCol >= 0 && newLeftCol <= 2 * L - 2)
                     {
                         sum += (matrix[newUpLine][newUpCol] * matrix[newLeftLine][newLeftCol]);
                         newUpLine -= 1;
@@ -108,7 +108,10 @@ public:
                     }
                     
                 }
-                matrix[i][new_v] = (matrix[i][new_v]-sum)/matrix[i][L-1];
+                if (matrix[i][L - 1] != 0)
+                {
+                    matrix[i][new_v] = (matrix[i][new_v]-sum)/matrix[i][L-1];
+                }
                 new_v += 1;
             }
         }
@@ -124,8 +127,8 @@ public:
 
 int main() {
     std::string filename = "matrix.txt";
-    int N = 5; // Размер обычной матрицы
-    int L = 2; // Половина ширины ленты
+    int N = 6; // Размер обычной матрицы
+    int L = 4; // Половина ширины ленты
 
     std::vector<double> b = { 1.0, 2.0, 3.0, 4.0, 5.0 }; // Вектор b в СЛАУ Ax=b
 
