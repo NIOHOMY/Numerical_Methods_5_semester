@@ -1,6 +1,13 @@
 ﻿#include <iostream>
+#include <cstdlib>
+#include <ctime>
+#include <iomanip>
 #include <fstream>
 #include <vector>
+
+double generateRandomNumber(double min_val, double max_val) {
+    return min_val + static_cast<double>(rand()) / (static_cast<double>(RAND_MAX / (max_val - min_val)));
+}
 
 class LentochnayaMatrix {
 private:
@@ -9,24 +16,47 @@ private:
     int N; // Размер обычной матрицы NxN
     int L; // Половина ширины ленты
 
+    bool solved = false;
+
     std::vector<double> x;
     std::vector<double> f;
 
     double E = 0.0000001;
 
 public:
-    void PrintMatrix()
-    {
-        for (size_t i = 0; i < N; i++)
-        {
-            for (size_t j = 0; j < 2 * L - 1; j++)
-            {
-                std::cout << ' ' << matrix[i][j];
+    void PrintMatrix() {
+        for (size_t i = 0; i < N; i++) {
+            for (size_t j = 0; j < 2 * L - 1; j++) {
+                std::cout << std::fixed << std::setprecision(5) << std::setw(10) << matrixCopy[i][j] << " ";
             }
             std::cout << std::endl;
         }
         std::cout << std::endl;
     }
+    void PrintLUMatrix() {
+        if (solved)
+        {
+            for (size_t i = 0; i < N; i++) {
+                for (size_t j = 0; j < 2 * L - 1; j++) {
+                    std::cout << std::fixed << std::setprecision(5) << std::setw(10) << matrix[i][j] << " ";
+                }
+                std::cout << std::endl;
+            }
+            std::cout << std::endl;
+        }
+    }
+    void PrintSoluution() {
+        if (solved)
+        {
+            std::cout << "Решение СЛАУ:" << std::endl;
+            for (int i = 0; i < N; ++i) {
+                std::cout << "x[" << i << "] = " << x[i] << std::endl;
+            }
+        }
+    }
+
+    bool isSolved() { return solved; }
+
 
     LentochnayaMatrix(const std::string& filename, int n, int l) : N(n), L(l) {
         matrix.resize(N, std::vector<double>(2 * L - 1));
@@ -68,6 +98,54 @@ public:
         file.close();
     }
 
+    LentochnayaMatrix(double minValue, double maxValue, int n, int l) : N(n), L(l)
+    {
+        matrix.resize(N, std::vector<double>(2 * L - 1));
+        matrix.reserve(N);
+        matrixCopy.resize(N, std::vector<double>(2 * L - 1));
+        matrixCopy.reserve(N);
+
+        f.resize(N); f.reserve(N);
+        x.resize(N); x.reserve(N);
+        int count = L - 1;
+        for (size_t i = 0; i < N; i++)
+        {
+            matrix[i].reserve(2 * L - 1);
+            matrixCopy[i].reserve(2 * L - 1);
+            f[i] = generateRandomNumber(minValue, maxValue);
+            if (count < 2 * L - 1 && i < L)
+            {
+                ++count;
+            }
+            else if (i > N - L)
+            {
+                --count;
+            }
+            for (size_t j = 0; j < count; j++)
+            {
+                double value = generateRandomNumber(minValue, maxValue);
+                if (i < L)
+                {
+                    if (2 * L - 1 - count + j == L-1 && value==0)
+                    {
+                        value = 1;
+                    }
+                    matrix[i][2 * L - 1 - count + j] = value;
+                    matrixCopy[i][2 * L - 1 - count + j] = value;
+                }
+                else
+                {
+                    if (j == L - 1 && value == 0)
+                    {
+                        value = 1;
+                    }
+                    matrix[i][j] = value;
+                    matrixCopy[i][j] = value;
+                }
+            }
+        }
+    }
+
     void solveSLAE() {
         // Метод Халецкого для решения СЛАУ Ax=b
         for (size_t i = L; i < 2 * L - 1; i++)
@@ -76,7 +154,7 @@ public:
         }
         for (size_t i = 1; i < N; i++)
         {
-            PrintMatrix();
+            //PrintMatrix();
             // col_v with w
             int newUpLine = i-1;
             int newUpCol = L;
@@ -151,7 +229,7 @@ public:
                 }
             }
             y[i] = (f[i] - sum)/matrix[i][L-1];
-            std::cout << y[i]<<" , ";
+            //std::cout << y[i]<<" , ";
         }
         // решение Ux=y
         
@@ -170,14 +248,11 @@ public:
         
         if (checkSolution())
         {
-            // Выводим решение
-            std::cout << "Решение СЛАУ:" << std::endl;
-            for (int i = 0; i < N; ++i) {
-                std::cout << "x[" << i << "] = " << x[i] << std::endl;
-            }
+            solved = true;
+            
         }
         else {
-            std::cout << "Нет решения СЛАУ" << std::endl;
+            std::cout << " ! Нет решения СЛАУ" << std::endl;
 
         }
     }
@@ -224,9 +299,14 @@ int main() {
     int L = 3; // Половина ширины ленты
 
     LentochnayaMatrix lenta(filename, N, L);
+    //LentochnayaMatrix lenta(-10, 10, N, L);
     lenta.PrintMatrix();
     lenta.solveSLAE();
-    lenta.PrintMatrix();
+    if (lenta.isSolved())
+    {
+        lenta.PrintLUMatrix();
+        lenta.PrintSoluution();
+    }
 
     return 0;
 }
