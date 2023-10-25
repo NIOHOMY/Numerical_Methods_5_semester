@@ -12,7 +12,7 @@ int main() {
     if (lenta.isSolved())
     {
         lenta.PrintLUMatrix();
-        lenta.PrintSoluution();
+        lenta.PrintSolution();
     }
 
     return 0;
