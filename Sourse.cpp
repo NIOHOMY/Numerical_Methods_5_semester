@@ -5,8 +5,14 @@
 class LentochnayaMatrix {
 private:
     std::vector<std::vector<double>> matrix;
+    std::vector<std::vector<double>> matrixCopy;
     int N; // Размер обычной матрицы NxN
     int L; // Половина ширины ленты
+
+    std::vector<double> x;
+    std::vector<double> f;
+
+    double E = 0.0000001;
 
 public:
     void PrintMatrix()
@@ -25,7 +31,8 @@ public:
     LentochnayaMatrix(const std::string& filename, int n, int l) : N(n), L(l) {
         matrix.resize(N, std::vector<double>(2 * L - 1));
         matrix.reserve(N);
-
+        matrixCopy.resize(N, std::vector<double>(2 * L - 1));
+        matrixCopy.reserve(N);
         std::ifstream file(filename);
         if (!file.is_open()) {
             std::cerr << "Ошибка открытия файла." << std::endl;
@@ -35,19 +42,33 @@ public:
         double value;
         for (int i = 0; i < N; ++i) {
             matrix[i].reserve(2 * L - 1);
+            matrixCopy[i].reserve(2 * L - 1);
             for (int j = 0; j < N; ++j) {
                 file >> value;
                 int new_col = j - i + L - 1;
-                if(new_col >= 0 && new_col < 2*L-1)
+                if (new_col >= 0 && new_col < 2 * L - 1)
+                {
                     matrix[i][new_col] = value;
+                    matrixCopy[i][new_col] = value;
+                }
             }
         }
         matrix[N - 1][2 * L - 2] = 0;
+        matrixCopy[N - 1][2 * L - 2] = 0;
+
+        f.resize(N); f.reserve(N);
+        for (size_t i = 0; i < N; i++)
+        {
+            file >> value;
+            f[i]=(value);
+        }
+
+        x.resize(N); x.reserve(N);
 
         file.close();
     }
 
-    void solveSLAE(std::vector<double>& b) {
+    void solveSLAE() {
         // Метод Халецкого для решения СЛАУ Ax=b
         for (size_t i = L; i < 2 * L - 1; i++)
         {
@@ -116,7 +137,7 @@ public:
             }
         }
 
-        // решение Ly=b
+        // решение Ly=f
         std::vector<double> y;
         y.resize(N); y.reserve(N);
         for (int i = 0; i <N; ++i)
@@ -129,11 +150,11 @@ public:
                     sum += y[i - j - 1]* matrix[i][L - j - 2];
                 }
             }
-            y[i] = (b[i] - sum)/matrix[i][L-1];
+            y[i] = (f[i] - sum)/matrix[i][L-1];
             std::cout << y[i]<<" , ";
         }
         // решение Ux=y
-        std::vector<double> x(N); x.reserve(N);
+        
         for (int i = N-1; i >= 0; --i)
         {
             double sum = 0;
@@ -147,11 +168,53 @@ public:
             x[i] = y[i] - sum;
         }
         
-        // Выводим решение
-        std::cout << "Решение СЛАУ:" << std::endl;
-        for (int i = 0; i < N; ++i) {
-            std::cout << "x[" << i << "] = " << x[i] << std::endl;
+        if (checkSolution())
+        {
+            // Выводим решение
+            std::cout << "Решение СЛАУ:" << std::endl;
+            for (int i = 0; i < N; ++i) {
+                std::cout << "x[" << i << "] = " << x[i] << std::endl;
+            }
         }
+        else {
+            std::cout << "Нет решения СЛАУ" << std::endl;
+
+        }
+    }
+
+    bool checkSolution()
+    {
+        bool check = true;
+        double sum = 0;
+        int count = L-1;
+        for (size_t i = 0; i < N && check; i++)
+        {
+            sum = 0;
+            if (count < 2*L-1 && i<L)
+            {
+                ++count;
+            }
+            else if (i>N-L)
+            {
+                --count;
+            }
+            for (size_t j = 0; j < count; j++)
+            {
+                if (i<L)
+                {
+                    sum+=x[j]* matrixCopy[i][2 * L - 1 - count + j];
+                }
+                else
+                {
+                    sum += x[i-L+1+ j] * matrixCopy[i][j];
+                }
+            }
+            if (f[i]-sum > E)
+            {
+                check = false;
+            }
+        }
+        return check;
     }
 };
 
@@ -160,11 +223,9 @@ int main() {
     int N = 10; // Размер обычной матрицы
     int L = 3; // Половина ширины ленты
 
-    std::vector<double> b = { 1.0, 2.0, 3.0, 4.0, 5.0, 1.0, 2.0, 3.0, 4.0, 5.0 }; // Вектор b в СЛАУ Ax=b
-
     LentochnayaMatrix lenta(filename, N, L);
     lenta.PrintMatrix();
-    lenta.solveSLAE(b);
+    lenta.solveSLAE();
     lenta.PrintMatrix();
 
     return 0;
