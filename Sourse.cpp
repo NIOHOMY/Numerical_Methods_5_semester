@@ -116,30 +116,9 @@ public:
             }
         }
 
-        // решение Uy=f
+        // решение Ly=b
         std::vector<double> y;
         y.resize(N); y.reserve(N);
-        for (int i = N-1; i >= 0; --i)
-        {
-            double sum = 0;
-            for (int j = 0; j < L-1; j++)
-            {
-                if (i + j + 1 < N)
-                {
-                    sum += y[i + j + 1]* matrix[i][L + j];
-                }
-                /*else
-                {
-                    sum += matrix[i][L + j];
-                }*/
-            }
-            y[i] = b[i] - sum;
-            std::cout << y[i]<<" , ";
-        }
-        
-        // решение Lx=y
-        std::vector<double> x(N); x.reserve(N);
-        
         for (int i = 0; i <N; ++i)
         {
             double sum = 0;
@@ -149,12 +128,25 @@ public:
                 {
                     sum += y[i - j - 1]* matrix[i][L - j - 2];
                 }
-                /*else {
-                    sum += matrix[i][L - j - 2];
-                }*/
             }
-            x[i] = (y[i] - sum)/matrix[i][L-1];
+            y[i] = (b[i] - sum)/matrix[i][L-1];
+            std::cout << y[i]<<" , ";
         }
+        // решение Ux=y
+        std::vector<double> x(N); x.reserve(N);
+        for (int i = N-1; i >= 0; --i)
+        {
+            double sum = 0;
+            for (int j = 0; j < L-1; j++)
+            {
+                if (i + j + 1 < N)
+                {
+                    sum += x[i + j + 1]* matrix[i][L + j];
+                }
+            }
+            x[i] = y[i] - sum;
+        }
+        
         // Выводим решение
         std::cout << "Решение СЛАУ:" << std::endl;
         for (int i = 0; i < N; ++i) {
