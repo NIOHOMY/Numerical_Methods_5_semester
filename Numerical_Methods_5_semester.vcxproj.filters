@@ -16,6 +16,9 @@
     <Filter Include="Source Files\Models">
       <UniqueIdentifier>{84c9fbdf-658c-4088-be42-26756f183b34}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Tools">
+      <UniqueIdentifier>{5133f9ae-b418-4072-85a6-a060de4381bd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sourse.cpp">
@@ -24,8 +27,16 @@
     <ClCompile Include="TapeMatrix.h">
       <Filter>Source Files\Models</Filter>
     </ClCompile>
+    <ClCompile Include="functions.cpp">
+      <Filter>Source Files\Tools</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="matrix.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="functions.h">
+      <Filter>Source Files\Tools</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
