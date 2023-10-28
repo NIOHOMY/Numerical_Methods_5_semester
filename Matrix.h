@@ -27,11 +27,14 @@ public:
     double getE1() { return E1; }
     double getE2() { return E2; }
     void getArrays(double a[], double b[], double c[], double p1[], double pn[], double rsh[]);
-    bool isSolved() {return solved;}
+    bool isSolved() { return solved; }
     size_t getSize() { return SIZE; }
 
     double getDefaultValueMultipleSolutions() { return defaultValueMultipleSolutions; }
     void setDefaultValueMultipleSolutions(double defaultValueMultipleSolutions) { this->defaultValueMultipleSolutions = defaultValueMultipleSolutions; }
+
+    double getQ() { return q; }
+    void setQ(double _q) { this->q = _q; }
 private:
     ~Matrix();
     void getRhsForSystemErrors();
@@ -42,6 +45,7 @@ private:
 
     size_t SIZE;
     double defaultValueMultipleSolutions = -999;
+    double q = 0.0000000001;
     double* a; double* b; double* c;
     double* p1; double* pn;
     double* rhs;
@@ -73,7 +77,7 @@ double generateRandomNumber(double range_min, double range_max) {
 void Matrix::solve()
 {
     getRhsForSystemErrors();
-    
+
     for (size_t j = 1; j < SIZE; j++)
     {
         p1[j - 1] = b[j - 1];
@@ -92,7 +96,7 @@ void Matrix::solve()
                 tmp = pn[j - 1];
                 pn[j - 1] = pn[j];
                 pn[j] = tmp;
-                
+
                 tmp = rhs[j - 1];
                 rhs[j - 1] = rhs[j];
                 rhs[j] = tmp;
@@ -188,12 +192,20 @@ void Matrix::solve()
 
         if (solved)
         {
+            //printArray(eSolution2X, SIZE);
+
             double Er1 = 11;
             double Er2 = 11;
             for (size_t i = 0; i < SIZE; i++)
             {
                 double er1 = (eSolution1X[i] - 1) < 0 ? (eSolution1X[i] * (-1) + 1) : (eSolution1X[i] - 1);
                 double er2 = (eSolution2X[i] - e2X[i]) < 0 ? (eSolution2X[i] * (-1) + e2X[i]) : (eSolution2X[i] - e2X[i]);
+                if (e2X[i] > q || (((-1) * e2X[i]) > q))
+                {
+                    if (e2X[i] < 0)
+                        e2X[i] *= -1;
+                    er2 /= e2X[i];
+                }
                 if (Er1 < er1 || Er1>10)
                 {
                     Er1 = er1;
@@ -292,8 +304,10 @@ Matrix::Matrix(size_t size, double range_min, double range_max)
     for (size_t i = 0; i < SIZE; ++i) {
         x[i] = 0;
         double number;
-        number = generateRandomNumber(range_min, range_max); 
+        number = generateRandomNumber(range_min, range_max/*-0.1, 0.1*/);
         e2X[i] = number;
+        //printArray(e2X, SIZE);
+        //std::cout << e2X[i]<<' ';
 
         if (i < SIZE - 1)
         {
@@ -375,7 +389,7 @@ void Matrix::fillMatrix(const std::string& fileName)
     std::ifstream file(fileName);
     if (file.is_open())
     {
-        double value; double min=1, max=1;
+        double value; double min = 1, max = 1;
         for (int i = 0; i < SIZE; ++i)
         {
             x[i] = 0;
@@ -383,11 +397,11 @@ void Matrix::fillMatrix(const std::string& fileName)
             {
                 double value;
                 file >> value;
-                if (value<min)
+                if (value < min)
                 {
                     min = value;
                 }
-                if (value>max)
+                if (value > max)
                 {
                     max = value;
                 }
@@ -503,10 +517,10 @@ bool Matrix::isCorrectToBeSolved()
     double* testRHS = new double[SIZE];
 
 
-    if ((rhs[SIZE - 1] > E || rhs[SIZE - 1] < -E) && p1[SIZE - 1] == 0)
+    if ((rhs[SIZE - 1] > E || rhs[SIZE - 1] < -E) && p1[SIZE - 1] == 0) // -1*1 + 0*x + 1*1 = 10
         return false;
 
-    for (size_t i = 0; i < SIZE; i++)
+    /*for (size_t i = 0; i < SIZE; i++)
         testRHS[i] = rhs[i] - pn[i] * x[SIZE - 1];
 
 
@@ -521,7 +535,7 @@ bool Matrix::isCorrectToBeSolved()
         }
         if (((testRHS[i] - a[i] * x[i + 1]) > E || (testRHS[i] - a[i] * x[i + 1]) < -E) && p1[i] == 0)
             return false;
-    }
+    }*/
 
     return true;
 }

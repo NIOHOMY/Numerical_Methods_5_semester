@@ -137,6 +137,10 @@
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="Utils.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Untitled 1.odt" />
+    <None Include="отчёт_3_курс_62_группа_1_подгруппа_ПахомоваПВ.pdf" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
