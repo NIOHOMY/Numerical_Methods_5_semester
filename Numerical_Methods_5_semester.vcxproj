@@ -128,14 +128,17 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="functions.cpp" />
-    <ClCompile Include="TapeMatrix.h" />
     <ClCompile Include="Sourse.cpp" />
+    <ClCompile Include="TestE.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="matrix.txt" />
+    <Text Include="output.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="functions.h" />
+    <ClInclude Include="TapeMatrix.h" />
+    <ClInclude Include="TestE.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

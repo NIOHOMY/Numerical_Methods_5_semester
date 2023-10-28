@@ -1,8 +1,9 @@
-#pragma once
 
-#ifndef RANDOM_H
-#define RANDOM_H
+#ifndef TOOLSFUNC_H
+#define TOOLSFUNC_H
 
 double generateRandomNumber(double min, double max);
+
+double roundError(double error);
 
 #endif

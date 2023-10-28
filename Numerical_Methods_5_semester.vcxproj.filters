@@ -13,10 +13,13 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Source Files\Models">
+    <Filter Include="Models">
       <UniqueIdentifier>{84c9fbdf-658c-4088-be42-26756f183b34}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Tools">
+    <Filter Include="Tests">
+      <UniqueIdentifier>{dc2c7a18-97b1-41a4-8f31-40c99db2748d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tools">
       <UniqueIdentifier>{5133f9ae-b418-4072-85a6-a060de4381bd}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -24,19 +27,28 @@
     <ClCompile Include="Sourse.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TapeMatrix.h">
-      <Filter>Source Files\Models</Filter>
-    </ClCompile>
     <ClCompile Include="functions.cpp">
-      <Filter>Source Files\Tools</Filter>
+      <Filter>Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="TestE.cpp">
+      <Filter>Tests</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="matrix.txt" />
+    <Text Include="output.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="functions.h">
-      <Filter>Source Files\Tools</Filter>
+      <Filter>Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="TestE.h">
+      <Filter>Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="TapeMatrix.h">
+      <Filter>Models</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

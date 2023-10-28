@@ -21,7 +21,12 @@ private:
     std::vector<double> x;
     std::vector<double> f;
 
-    double E = 0.0000001;
+    double q = 0.0000001;
+    std::vector<double> accuracyX;
+    std::vector<double> solutionForAccuracyX;
+    std::vector<double> accuracyF;
+    double meanRatioRelativeAccuracy = 0.0;
+
 
 public:
     void PrintMatrix() {
@@ -85,6 +90,12 @@ public:
             matrix.reserve(N);
             matrixCopy.resize(N, std::vector<double>(2 * L - 1));
             matrixCopy.reserve(N);
+
+            f.resize(N); f.reserve(N);
+            x.resize(N); x.reserve(N);
+            accuracyX.resize(N); accuracyX.reserve(N);
+            accuracyF.resize(N); accuracyF.reserve(N);
+            solutionForAccuracyX.resize(N); solutionForAccuracyX.reserve(N);
             std::ifstream file(filename);
             if (!file.is_open()) {
                 throw std::runtime_error("Ошибка открытия файла.");
@@ -94,6 +105,7 @@ public:
             for (int i = 0; i < N; ++i) {
                 matrix[i].reserve(2 * L - 1);
                 matrixCopy[i].reserve(2 * L - 1);
+                accuracyX[i] = generateRandomNumber(-100, 100);
                 for (int j = 0; j < N; ++j) {
                     file >> value;
                     int new_col = j - i + L - 1;
@@ -114,8 +126,7 @@ public:
                 f[i] = (value);
             }
 
-            x.resize(N); x.reserve(N);
-
+            getAccuracyF();
             file.close();
         }
         catch (const std::exception& e) {
@@ -132,11 +143,15 @@ public:
 
             f.resize(N); f.reserve(N);
             x.resize(N); x.reserve(N);
+            accuracyX.resize(N); accuracyX.reserve(N);
+            accuracyF.resize(N); accuracyF.reserve(N);
+            solutionForAccuracyX.resize(N); solutionForAccuracyX.reserve(N);
             int count = L - 1;
             for (size_t i = 0; i < N; i++) {
                 matrix[i].reserve(2 * L - 1);
                 matrixCopy[i].reserve(2 * L - 1);
                 f[i] = generateRandomNumber(minValue, maxValue);
+                accuracyX[i] = generateRandomNumber(minValue, maxValue);
                 if (count < 2 * L - 1 && i < L) {
                     ++count;
                 }
@@ -161,10 +176,55 @@ public:
                     }
                 }
             }
+            matrix[N - 1][2 * L - 2] = 0;
+            matrixCopy[N - 1][2 * L - 2] = 0;
+            getAccuracyF();
         }
         catch (const std::exception& e) {
             std::cerr << "Ошибка: " << e.what() << std::endl;
         }
+    }
+
+    void getAccuracyF()
+    {
+        try
+        {
+            double sum = 0;
+            int count = L - 1;
+            for (size_t i = 0; i < N; i++)
+            {
+                sum = 0;
+                if (count < 2 * L - 1 && i < L)
+                {
+                    ++count;
+                }
+                else if (i > N - L && N!=L)
+                {
+                    --count;
+                }
+                for (size_t j = 0; j < count && j<N; j++)
+                {
+                    if (i < L)
+                    {
+                        ////int xIndex = j < N ? j : N - 1;
+                        //int ii = 2 * L - 1 - count + j;
+                        //double xx = accuracyX[j];
+                        //double xxM = matrixCopy[i][2 * L - 1 - count + j];
+                        sum += accuracyX[j] * matrixCopy[i][2 * L - 1 - count + j];
+                    }
+                    else
+                    {
+                        sum += accuracyX[i - L + 1 + j] * matrixCopy[i][j];
+                    }
+                }
+                accuracyF[i] = sum;
+            }
+        }
+        catch (const std::exception& e)
+        {
+            std::cerr << "Error in checkSolution(): " << e.what() << std::endl;
+        }
+
     }
 
     void solveSLAE() {
@@ -175,6 +235,7 @@ public:
         if (checkSolution())
         {
             solved = true;
+            getMeanRatioRelativeAccuracyBySolution();
         }
     }
 
@@ -203,9 +264,42 @@ public:
         return f;
     }
 
-    double getE() const {
-        return E;
+    double getMeanRatioRelativeAccuracy() const {
+        return meanRatioRelativeAccuracy;
     }
+
+    TapeMatrix& operator=(const TapeMatrix& other) {
+        if (this != &other) {
+            N = other.N;
+            L = other.L;
+            solved = other.solved;
+            q = other.q;
+            meanRatioRelativeAccuracy = other.meanRatioRelativeAccuracy;
+
+            matrix = other.matrix;
+            matrixCopy = other.matrixCopy;
+            x = other.x;
+            f = other.f;
+            accuracyX = other.accuracyX;
+            solutionForAccuracyX = other.solutionForAccuracyX;
+            accuracyF = other.accuracyF;
+
+            // Присваивание значений каждого элемента массивов и векторов
+            for (int i = 0; i < N; ++i) {
+                for (int j = 0; j < N; ++j) {
+                    matrix[i][j] = other.matrix[i][j];
+                    matrixCopy[i][j] = other.matrixCopy[i][j];
+                }
+                x[i] = other.x[i];
+                f[i] = other.f[i];
+                accuracyX[i] = other.accuracyX[i];
+                solutionForAccuracyX[i] = other.solutionForAccuracyX[i];
+                accuracyF[i] = other.accuracyF[i];
+            }
+        }
+        return *this;
+    }
+
 private:
     bool getLUMatrix()
     {
@@ -297,18 +391,23 @@ private:
         {
             // решение Ly=f
             std::vector<double> y;
+            std::vector<double> accuracyY;
             y.resize(N); y.reserve(N);
+            accuracyY.resize(N); accuracyY.reserve(N);
             for (int i = 0; i < N; ++i)
             {
                 double sum = 0;
+                double accuracySum = 0;
                 for (int j = 0; j < L - 1; j++)
                 {
                     if (i - j - 1 >= 0)
                     {
                         sum += y[i - j - 1] * matrix[i][L - j - 2];
+                        accuracySum += accuracyY[i - j - 1] * matrix[i][L - j - 2];
                     }
                 }
                 y[i] = (f[i] - sum) / matrix[i][L - 1];
+                accuracyY[i] = (accuracyF[i] - accuracySum) / matrix[i][L - 1];
                 //std::cout << y[i]<<" , ";
             }
             // решение Ux=y
@@ -316,21 +415,44 @@ private:
             for (int i = N - 1; i >= 0; --i)
             {
                 double sum = 0;
+                double accuracySum = 0;
                 for (int j = 0; j < L - 1; j++)
                 {
                     if (i + j + 1 < N)
                     {
                         sum += x[i + j + 1] * matrix[i][L + j];
+                        accuracySum += solutionForAccuracyX[i + j + 1] * matrix[i][L + j];
                     }
                 }
                 x[i] = y[i] - sum;
+                solutionForAccuracyX[i] = accuracyY[i] - accuracySum;
             }
-        
+            
         }
         catch (const std::exception& e)
         {
             std::cerr << "Error in getXSolution(): " << e.what() << std::endl;
         }
+    }
+
+    void getMeanRatioRelativeAccuracyBySolution()
+    {
+        double Er2 = 11;
+        for (size_t i = 0; i < N; i++)
+        {
+            double er2 = (solutionForAccuracyX[i] - accuracyX[i]) < 0 ? (solutionForAccuracyX[i] * (-1) + accuracyX[i]) : (solutionForAccuracyX[i] - accuracyX[i]);
+            if (accuracyX[i] > q || (((-1) * accuracyX[i]) > q))
+            {
+                if (accuracyX[i] < 0)
+                    accuracyX[i] *= -1;
+                er2 /= accuracyX[i];
+            }
+            if (Er2 < er2 || Er2>10)
+            {
+                Er2 = er2;
+            }
+        }
+        meanRatioRelativeAccuracy = Er2;
     }
 
     bool checkSolution()
@@ -347,11 +469,11 @@ private:
                 {
                     ++count;
                 }
-                else if (i > N - L)
+                else if (i > N - L && N != L)
                 {
                     --count;
                 }
-                for (size_t j = 0; j < count; j++)
+                for (size_t j = 0; j < count && j < N; j++)
                 {
                     if (i < L)
                     {
@@ -362,7 +484,7 @@ private:
                         sum += x[i - L + 1 + j] * matrixCopy[i][j];
                     }
                 }
-                if (f[i] - sum > E)
+                if (f[i] - sum > q || f[i]-sum < q * (-1))
                 {
                     check = false;
                 }
