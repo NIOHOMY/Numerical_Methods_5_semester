@@ -13,10 +13,13 @@ class TapeMatrix {
 private:
     std::vector<std::vector<double>> matrix;
     std::vector<std::vector<double>> matrixCopy;
+
+    std::vector<std::vector<double>> accuracyMatrixLU;
     int N; // Размер обычной матрицы NxN
     int L; // Половина ширины ленты
 
     bool solved = false;
+    bool illConditionedMatrices = false;
 
     std::vector<double> x;
     std::vector<double> f;
@@ -26,6 +29,10 @@ private:
     std::vector<double> solutionForAccuracyX;
     std::vector<double> accuracyF;
     double meanRatioRelativeAccuracy = 0.0;
+
+    std::vector<double> accuracyLUF;
+    std::vector<double> solutionForAccuracyLUX;
+    double meanRatioRelativeAccuracyIllConditionedMatrices = 0.0;
 
 
 public:
@@ -50,6 +57,26 @@ public:
                 for (size_t i = 0; i < N; i++) {
                     for (size_t j = 0; j < 2 * L - 1; j++) {
                         std::cout << std::fixed << std::setprecision(5) << std::setw(10) << matrix.at(i).at(j) << " ";
+                    }
+                    std::cout << std::endl;
+                }
+                std::cout << std::endl;
+            }
+            else {
+                throw std::logic_error("СЛАУ не была решена.");
+            }
+        }
+        catch (const std::exception& e) {
+            throw std::runtime_error("Ошибка при печати LU-матрицы: " + std::string(e.what()));
+        }
+    }
+
+    void PrintAccuracyLUMatrix() {
+        try {
+            if (illConditionedMatrices) {
+                for (size_t i = 0; i < N; i++) {
+                    for (size_t j = 0; j < 2 * L - 1; j++) {
+                        std::cout << std::fixed << std::setprecision(5) << std::setw(10) << accuracyMatrixLU.at(i).at(j) << " ";
                     }
                     std::cout << std::endl;
                 }
@@ -105,7 +132,7 @@ public:
             for (int i = 0; i < N; ++i) {
                 matrix[i].reserve(2 * L - 1);
                 matrixCopy[i].reserve(2 * L - 1);
-                accuracyX[i] = generateRandomNumber(-100, 100);
+                accuracyX[i] = 1;
                 for (int j = 0; j < N; ++j) {
                     file >> value;
                     int new_col = j - i + L - 1;
@@ -134,12 +161,21 @@ public:
         }
     }
 
-    TapeMatrix(double minValue, double maxValue, int n, int l) : N(n), L(l) {
+    TapeMatrix(double minValue, double maxValue, int n, int l, bool illConditionedMatrices = false, int k = 0) : N(n), L(l) {
         try {
             matrix.resize(N, std::vector<double>(2 * L - 1));
             matrix.reserve(N);
             matrixCopy.resize(N, std::vector<double>(2 * L - 1));
             matrixCopy.reserve(N);
+            this->illConditionedMatrices = illConditionedMatrices;
+
+            if (illConditionedMatrices)
+            {
+                accuracyMatrixLU.resize(N, std::vector<double>(2 * L - 1));
+                accuracyMatrixLU.reserve(N);
+                accuracyLUF.resize(N); accuracyLUF.reserve(N);
+                solutionForAccuracyLUX.resize(N); solutionForAccuracyLUX.reserve(N);
+            }
 
             f.resize(N); f.reserve(N);
             x.resize(N); x.reserve(N);
@@ -150,6 +186,10 @@ public:
             for (size_t i = 0; i < N; i++) {
                 matrix[i].reserve(2 * L - 1);
                 matrixCopy[i].reserve(2 * L - 1);
+                if (illConditionedMatrices)
+                {
+                    accuracyMatrixLU[i].reserve(2 * L - 1);
+                }
                 f[i] = generateRandomNumber(minValue, maxValue);
                 accuracyX[i] = generateRandomNumber(minValue, maxValue);
                 if (count < 2 * L - 1 && i < L) {
@@ -166,6 +206,12 @@ public:
                         }
                         matrix[i][2 * L - 1 - count + j] = value;
                         matrixCopy[i][2 * L - 1 - count + j] = value;
+                        if (illConditionedMatrices)
+                        {
+                            double aValue = generateRandomNumber(minValue, maxValue);
+                            accuracyMatrixLU[i][2 * L - 1 - count + j] = (aValue == 0)? 1: aValue;
+
+                        }
                     }
                     else {
                         if (j == L - 1 && value == 0) {
@@ -173,11 +219,26 @@ public:
                         }
                         matrix[i][j] = value;
                         matrixCopy[i][j] = value;
+                        if (illConditionedMatrices)
+                        {
+                            double aValue = generateRandomNumber(minValue, maxValue);
+                            accuracyMatrixLU[i][j] = (aValue == 0) ? 1 : aValue;
+                        }
                     }
                 }
             }
             matrix[N - 1][2 * L - 2] = 0;
             matrixCopy[N - 1][2 * L - 2] = 0;
+            if (illConditionedMatrices)
+            {
+                accuracyMatrixLU[N - 1][2 * L - 2] = 0;
+                for (size_t i = 0; i < N; i++)
+                {
+                    accuracyMatrixLU[i][L - 1] *= roundError(std::pow(10, -k));
+                }
+                //PrintAccuracyLUMatrix();
+                getAccuracyLUF();
+            }
             getAccuracyF();
         }
         catch (const std::exception& e) {
@@ -266,6 +327,15 @@ public:
 
     double getMeanRatioRelativeAccuracy() const {
         return meanRatioRelativeAccuracy;
+    }
+    double  getMeanRatioRelativeAccuracyIllConditionedMatrices() const {
+        if (illConditionedMatrices)
+        {
+            return meanRatioRelativeAccuracyIllConditionedMatrices;
+        }
+        else {
+            return -1;
+        }
     }
 
     TapeMatrix& operator=(const TapeMatrix& other) {
@@ -389,44 +459,101 @@ private:
     {
         try
         {
-            // решение Ly=f
-            std::vector<double> y;
-            std::vector<double> accuracyY;
-            y.resize(N); y.reserve(N);
-            accuracyY.resize(N); accuracyY.reserve(N);
-            for (int i = 0; i < N; ++i)
+            if (illConditionedMatrices)
             {
-                double sum = 0;
-                double accuracySum = 0;
-                for (int j = 0; j < L - 1; j++)
+                // решение Ly=f
+                std::vector<double> y;
+                std::vector<double> accuracyY;
+                std::vector<double> accuracyLUY;
+                y.resize(N); y.reserve(N);
+                accuracyY.resize(N); accuracyY.reserve(N);
+                accuracyLUY.resize(N); accuracyLUY.reserve(N);
+                for (int i = 0; i < N; ++i)
                 {
-                    if (i - j - 1 >= 0)
+                    double sum = 0;
+                    double accuracySum = 0;
+                    double accuracyLUSum = 0;
+                    for (int j = 0; j < L - 1; j++)
                     {
-                        sum += y[i - j - 1] * matrix[i][L - j - 2];
-                        accuracySum += accuracyY[i - j - 1] * matrix[i][L - j - 2];
+                        if (i - j - 1 >= 0)
+                        {
+                            sum += y[i - j - 1] * matrix[i][L - j - 2];
+                            accuracySum += accuracyY[i - j - 1] * matrix[i][L - j - 2];
+                            accuracyLUSum += accuracyLUY[i - j - 1] * accuracyMatrixLU[i][L - j - 2];
+                        }
                     }
+                    y[i] = (f[i] - sum) / matrix[i][L - 1];
+                    accuracyY[i] = (accuracyF[i] - accuracySum) / matrix[i][L - 1];
+                    accuracyLUY[i] = (accuracyLUF[i] - accuracyLUSum) / accuracyMatrixLU[i][L - 1];
+                    //std::cout << y[i]<<" , ";
                 }
-                y[i] = (f[i] - sum) / matrix[i][L - 1];
-                accuracyY[i] = (accuracyF[i] - accuracySum) / matrix[i][L - 1];
-                //std::cout << y[i]<<" , ";
-            }
-            // решение Ux=y
+                // решение Ux=y
 
-            for (int i = N - 1; i >= 0; --i)
-            {
-                double sum = 0;
-                double accuracySum = 0;
-                for (int j = 0; j < L - 1; j++)
+                for (int i = N - 1; i >= 0; --i)
                 {
-                    if (i + j + 1 < N)
+                    double sum = 0;
+                    double accuracySum = 0;
+                    double accuracyLUSum = 0;
+                    for (int j = 0; j < L - 1; j++)
                     {
-                        sum += x[i + j + 1] * matrix[i][L + j];
-                        accuracySum += solutionForAccuracyX[i + j + 1] * matrix[i][L + j];
+                        if (i + j + 1 < N)
+                        {
+                            sum += x[i + j + 1] * matrix[i][L + j];
+                            accuracySum += solutionForAccuracyX[i + j + 1] * matrix[i][L + j];
+                            accuracyLUSum += solutionForAccuracyLUX[i + j + 1] * accuracyMatrixLU[i][L + j];
+                        }
                     }
+                    x[i] = y[i] - sum;
+                    solutionForAccuracyX[i] = accuracyY[i] - accuracySum;
+                    solutionForAccuracyLUX[i] = accuracyLUY[i] - accuracyLUSum;
                 }
-                x[i] = y[i] - sum;
-                solutionForAccuracyX[i] = accuracyY[i] - accuracySum;
+                /*for (size_t i = 0; i < N; i++)
+                {
+                    std::cout << "XX" << i << ' ' << solutionForAccuracyLUX[i] << ' ';
+                }*/
             }
+            else
+            {
+                // решение Ly=f
+                std::vector<double> y;
+                std::vector<double> accuracyY;
+                y.resize(N); y.reserve(N);
+                accuracyY.resize(N); accuracyY.reserve(N);
+                for (int i = 0; i < N; ++i)
+                {
+                    double sum = 0;
+                    double accuracySum = 0;
+                    for (int j = 0; j < L - 1; j++)
+                    {
+                        if (i - j - 1 >= 0)
+                        {
+                            sum += y[i - j - 1] * matrix[i][L - j - 2];
+                            accuracySum += accuracyY[i - j - 1] * matrix[i][L - j - 2];
+                        }
+                    }
+                    y[i] = (f[i] - sum) / matrix[i][L - 1];
+                    accuracyY[i] = (accuracyF[i] - accuracySum) / matrix[i][L - 1];
+                    //std::cout << y[i]<<" , ";
+                }
+                // решение Ux=y
+
+                for (int i = N - 1; i >= 0; --i)
+                {
+                    double sum = 0;
+                    double accuracySum = 0;
+                    for (int j = 0; j < L - 1; j++)
+                    {
+                        if (i + j + 1 < N)
+                        {
+                            sum += x[i + j + 1] * matrix[i][L + j];
+                            accuracySum += solutionForAccuracyX[i + j + 1] * matrix[i][L + j];
+                        }
+                    }
+                    x[i] = y[i] - sum;
+                    solutionForAccuracyX[i] = accuracyY[i] - accuracySum;
+                }
+            }
+            
             
         }
         catch (const std::exception& e)
@@ -443,9 +570,7 @@ private:
             double er2 = (solutionForAccuracyX[i] - accuracyX[i]) < 0 ? (solutionForAccuracyX[i] * (-1) + accuracyX[i]) : (solutionForAccuracyX[i] - accuracyX[i]);
             if (accuracyX[i] > q || (((-1) * accuracyX[i]) > q))
             {
-                if (accuracyX[i] < 0)
-                    accuracyX[i] *= -1;
-                er2 /= accuracyX[i];
+                er2 /= accuracyX[i]<0? accuracyX[i]*(-1): accuracyX[i];
             }
             if (Er2 < er2 || Er2>10)
             {
@@ -453,6 +578,23 @@ private:
             }
         }
         meanRatioRelativeAccuracy = Er2;
+        if (illConditionedMatrices)
+        {
+            Er2 = 11;
+            for (size_t i = 0; i < N; i++)
+            {
+                double erLU = (solutionForAccuracyLUX[i] - accuracyX[i]) < 0 ? (solutionForAccuracyLUX[i] * (-1) + accuracyX[i]) : (solutionForAccuracyLUX[i] - accuracyX[i]);
+                if (accuracyX[i] > q || (((-1) * accuracyX[i]) > q))
+                {
+                    erLU /= accuracyX[i] < 0 ? accuracyX[i] * (-1) : accuracyX[i];
+                }
+                if (Er2 < erLU || Er2>10)
+                {
+                    Er2 = erLU;
+                }
+            }
+            meanRatioRelativeAccuracyIllConditionedMatrices = Er2;
+        }
     }
 
     bool checkSolution()
@@ -498,5 +640,57 @@ private:
         }
        
     }
+    void getAccuracyLUF()
+    {
+        try
+        {
+            // решение Ux=y
 
+            std::vector<double> y;
+            std::vector<double> accuracyY;
+            y.resize(N); y.reserve(N);
+            accuracyY.resize(N); accuracyY.reserve(N);
+            for (int i = N - 1; i >= 0; --i)
+            {
+                double accuracySum = 0;
+                for (int j = 0; j < L - 1; j++)
+                {
+                    if (i + j + 1 < N)
+                    {
+                        accuracySum += accuracyX[i + j + 1] * accuracyMatrixLU[i][L + j];
+                    }
+                }
+                accuracyY[i] = accuracyX[i] + accuracySum;
+            }
+            /*for (size_t i = 0; i < N; i++)
+            {
+                std::cout << "y" << i << ' ' << accuracyY[i]<<' ';
+            }*/
+            // решение Ly=f
+            for (int i = 0; i < N; ++i)
+            {
+                double accuracySum = 0;
+                for (int j = 0; j < L - 1; j++)
+                {
+                    if (i - j - 1 >= 0)
+                    {
+                        accuracySum += accuracyY[i - j - 1] * accuracyMatrixLU[i][L - j - 2];
+                    }
+                }
+                accuracyLUF[i]= accuracyMatrixLU[i][L - 1]>0? accuracyY[i] * accuracyMatrixLU[i][L - 1] + accuracySum: (accuracyY[i] * accuracyMatrixLU[i][L - 1] + accuracySum);
+            }
+            /*for (size_t i = 0; i < N; i++)
+            {
+                std::cout << "f" << i << ' ' << accuracyLUF[i] << ' ';
+            }
+            for (size_t i = 0; i < N; i++)
+            {
+                std::cout << "x" << i << ' ' << accuracyX[i] << ' ';
+            }*/
+        }
+        catch (const std::exception& e)
+        {
+            std::cerr << "Error in getXSolution(): " << e.what() << std::endl;
+        }
+    }
 };

@@ -4,6 +4,7 @@
 
 void testOne();
 void testTwo();
+void testThree();
 
 #endif
 
