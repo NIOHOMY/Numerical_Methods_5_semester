@@ -34,81 +34,7 @@ private:
     std::vector<double> solutionForAccuracyLUX;
     double meanRatioRelativeAccuracyIllConditionedMatrices = 0.0;
 
-
 public:
-    void PrintMatrix() {
-        try {
-            for (size_t i = 0; i < N; i++) {
-                for (size_t j = 0; j < 2 * L - 1; j++) {
-                    std::cout << std::fixed << std::setprecision(5) << std::setw(10) << matrixCopy.at(i).at(j) << " ";
-                }
-                std::cout << std::endl;
-            }
-            std::cout << std::endl;
-        }
-        catch (const std::exception& e) {
-            throw std::runtime_error("Ошибка при печати матрицы: " + std::string(e.what()));
-        }
-    }
-
-    void PrintLUMatrix() {
-        try {
-            if (solved) {
-                for (size_t i = 0; i < N; i++) {
-                    for (size_t j = 0; j < 2 * L - 1; j++) {
-                        std::cout << std::fixed << std::setprecision(5) << std::setw(10) << matrix.at(i).at(j) << " ";
-                    }
-                    std::cout << std::endl;
-                }
-                std::cout << std::endl;
-            }
-            else {
-                throw std::logic_error("СЛАУ не была решена.");
-            }
-        }
-        catch (const std::exception& e) {
-            throw std::runtime_error("Ошибка при печати LU-матрицы: " + std::string(e.what()));
-        }
-    }
-
-    void PrintAccuracyLUMatrix() {
-        try {
-            if (illConditionedMatrices) {
-                for (size_t i = 0; i < N; i++) {
-                    for (size_t j = 0; j < 2 * L - 1; j++) {
-                        std::cout << std::fixed << std::setprecision(5) << std::setw(10) << accuracyMatrixLU.at(i).at(j) << " ";
-                    }
-                    std::cout << std::endl;
-                }
-                std::cout << std::endl;
-            }
-            else {
-                throw std::logic_error("СЛАУ не была решена.");
-            }
-        }
-        catch (const std::exception& e) {
-            throw std::runtime_error("Ошибка при печати LU-матрицы: " + std::string(e.what()));
-        }
-    }
-
-    void PrintSolution() {
-        try {
-            if (solved) {
-                std::cout << "Решение СЛАУ:" << std::endl;
-                for (int i = 0; i < N; ++i) {
-                    std::cout << "x[" << i << "] = " << x.at(i) << std::endl;
-                }
-            }
-            else {
-                throw std::logic_error("СЛАУ не была решена.");
-            }
-        }
-        catch (const std::exception& e) {
-            throw std::runtime_error("Ошибка при печати решения СЛАУ: " + std::string(e.what()));
-        }
-    }
-
-    bool isSolved() { return solved; }
 
 
     TapeMatrix(const std::string& filename, int n, int l) : N(n), L(l) {
@@ -125,7 +51,7 @@ public:
             solutionForAccuracyX.resize(N); solutionForAccuracyX.reserve(N);
             std::ifstream file(filename);
             if (!file.is_open()) {
-                throw std::runtime_error("Ошибка открытия файла.");
+                throw std::runtime_error("Open file error.");
             }
 
             double value;
@@ -157,7 +83,7 @@ public:
             file.close();
         }
         catch (const std::exception& e) {
-            std::cerr << "Ошибка: " << e.what() << std::endl;
+            throw std::runtime_error( "Error: "+ std::string(e.what()));
         }
     }
 
@@ -242,89 +168,104 @@ public:
             getAccuracyF();
         }
         catch (const std::exception& e) {
-            std::cerr << "Ошибка: " << e.what() << std::endl;
+            throw std::runtime_error( "Error: " + std::string(e.what()));
         }
     }
 
-    void getAccuracyF()
-    {
-        try
+    TapeMatrix(const TapeMatrix& other) {
+        matrix = other.matrix;
+        matrixCopy = other.matrixCopy;
+        N = other.N;
+        L = other.L;
+        solved = other.solved;
+        x = other.x;
+        f = other.f;
+        q = other.q;
+        accuracyX = other.accuracyX;
+        solutionForAccuracyX = other.solutionForAccuracyX;
+        accuracyF = other.accuracyF;
+        meanRatioRelativeAccuracy = other.meanRatioRelativeAccuracy;
+        
+        illConditionedMatrices = other.illConditionedMatrices;
+        if (other.illConditionedMatrices)
         {
-            double sum = 0;
-            int count = L - 1;
-            for (size_t i = 0; i < N; i++)
-            {
-                sum = 0;
-                if (count < 2 * L - 1 && i < L)
-                {
-                    ++count;
-                }
-                else if (i > N - L && N!=L)
-                {
-                    --count;
-                }
-                for (size_t j = 0; j < count && j<N; j++)
-                {
-                    if (i < L)
-                    {
-                        ////int xIndex = j < N ? j : N - 1;
-                        //int ii = 2 * L - 1 - count + j;
-                        //double xx = accuracyX[j];
-                        //double xxM = matrixCopy[i][2 * L - 1 - count + j];
-                        sum += accuracyX[j] * matrixCopy[i][2 * L - 1 - count + j];
-                    }
-                    else
-                    {
-                        sum += accuracyX[i - L + 1 + j] * matrixCopy[i][j];
-                    }
-                }
-                accuracyF[i] = sum;
-            }
-        }
-        catch (const std::exception& e)
-        {
-            std::cerr << "Error in checkSolution(): " << e.what() << std::endl;
-        }
-
-    }
-
-    void solveSLAE() {
-
-        if (getLUMatrix())
-            getXSolution();
-
-        if (checkSolution())
-        {
-            solved = true;
-            getMeanRatioRelativeAccuracyBySolution();
+            accuracyMatrixLU = other.accuracyMatrixLU;
+            accuracyLUF = other.accuracyLUF;
+            solutionForAccuracyLUX = other.solutionForAccuracyLUX;
+            meanRatioRelativeAccuracyIllConditionedMatrices = other.meanRatioRelativeAccuracyIllConditionedMatrices;
         }
     }
+    TapeMatrix& operator=(const TapeMatrix& other) {
+        if (this == &other) {
+            return *this;
+        }
+
+        matrix = other.matrix;
+        matrixCopy = other.matrixCopy;
+        N = other.N;
+        L = other.L;
+        solved = other.solved;
+        x = other.x;
+        f = other.f;
+        q = other.q;
+        accuracyX = other.accuracyX;
+        solutionForAccuracyX = other.solutionForAccuracyX;
+        accuracyF = other.accuracyF;
+        meanRatioRelativeAccuracy = other.meanRatioRelativeAccuracy;
+
+        illConditionedMatrices = other.illConditionedMatrices;
+        if (other.illConditionedMatrices)
+        {
+            accuracyMatrixLU = other.accuracyMatrixLU;
+            accuracyLUF = other.accuracyLUF;
+            solutionForAccuracyLUX = other.solutionForAccuracyLUX;
+            meanRatioRelativeAccuracyIllConditionedMatrices = other.meanRatioRelativeAccuracyIllConditionedMatrices;
+        }
+
+        return *this;
+    }
+    
 
     std::vector<std::vector<double>> getLUMatrixTape() const {
         return solved ? matrix : std::vector<std::vector<double>>();
     }
-
+    std::vector<std::vector<double>> getaccuracyMatrixTapeLU() const {
+        return illConditionedMatrices ? accuracyMatrixLU : std::vector<std::vector<double>>();
+    }
     std::vector<std::vector<double>> getOriginalMatrixTape() const {
         return matrixCopy;
     }
 
+    bool isSolved() { return solved; }
+
     int getN() const {
         return N;
     }
-
     int getL() const {
         return L;
     }
-
-
-    std::vector<double> getX() const {
+    double getQ() const {
+        return q;
+    }
+    std::vector<double> getSolution() const {
         return solved ? x : std::vector<double>();
     }
-
     std::vector<double> getF() const {
         return f;
     }
 
+    std::vector<double> getAccuracyX() const {
+        return solved ? accuracyX : std::vector<double>();
+    }
+    std::vector<double> getAccuracyF() const {
+        return accuracyF;
+    }
+    std::vector<double> getAccuracyFLU() const {
+        return f;
+    }
+    std::vector<double> getSolutionForAccuracyLUX() const {
+        return illConditionedMatrices && solved? solutionForAccuracyLUX : std::vector<double>();
+    }
     double getMeanRatioRelativeAccuracy() const {
         return meanRatioRelativeAccuracy;
     }
@@ -338,36 +279,17 @@ public:
         }
     }
 
-    TapeMatrix& operator=(const TapeMatrix& other) {
-        if (this != &other) {
-            N = other.N;
-            L = other.L;
-            solved = other.solved;
-            q = other.q;
-            meanRatioRelativeAccuracy = other.meanRatioRelativeAccuracy;
 
-            matrix = other.matrix;
-            matrixCopy = other.matrixCopy;
-            x = other.x;
-            f = other.f;
-            accuracyX = other.accuracyX;
-            solutionForAccuracyX = other.solutionForAccuracyX;
-            accuracyF = other.accuracyF;
+    void solveSLAE() {
 
-            // Присваивание значений каждого элемента массивов и векторов
-            for (int i = 0; i < N; ++i) {
-                for (int j = 0; j < N; ++j) {
-                    matrix[i][j] = other.matrix[i][j];
-                    matrixCopy[i][j] = other.matrixCopy[i][j];
-                }
-                x[i] = other.x[i];
-                f[i] = other.f[i];
-                accuracyX[i] = other.accuracyX[i];
-                solutionForAccuracyX[i] = other.solutionForAccuracyX[i];
-                accuracyF[i] = other.accuracyF[i];
-            }
+        if (getLUMatrix())
+            getXSolution();
+
+        if (checkSolution())
+        {
+            solved = true;
+            getMeanRatioRelativeAccuracyBySolution();
         }
-        return *this;
     }
 
 private:
@@ -376,11 +298,15 @@ private:
         try
         {
             // Метод Халецкого для решения СЛАУ Ax=b
+            if (matrix[0][L - 1] == 0)
+            {
+                return false;
+            }
             for (size_t i = L; i < 2 * L - 1; i++)
             {
                 matrix[0][i] = matrix[0][i] / matrix[0][L - 1];
             }
-            for (size_t i = 1; i < N; i++)
+            for (int i = 1; i < N; i++)
             {
                 //PrintMatrix();
                 // col_v with w
@@ -391,7 +317,7 @@ private:
                 double sum = 0;
 
                 int new_v = L - 2;
-                for (size_t k = 0; k < L; k++)
+                for (int k = 0; k < L; k++)
                 {
                     newUpLine = i - 1;
                     newUpCol = L;
@@ -450,11 +376,10 @@ private:
         }
         catch (const std::exception& e)
         {
-            std::cerr << "Error in getLUMatrix(): " << e.what() << std::endl;
+            throw std::runtime_error( "Error in getLUMatrix(): " + std::string(e.what()));
             return false;
         }
     }
-
     void getXSolution()
     {
         try
@@ -558,42 +483,7 @@ private:
         }
         catch (const std::exception& e)
         {
-            std::cerr << "Error in getXSolution(): " << e.what() << std::endl;
-        }
-    }
-
-    void getMeanRatioRelativeAccuracyBySolution()
-    {
-        double Er2 = 11;
-        for (size_t i = 0; i < N; i++)
-        {
-            double er2 = (solutionForAccuracyX[i] - accuracyX[i]) < 0 ? (solutionForAccuracyX[i] * (-1) + accuracyX[i]) : (solutionForAccuracyX[i] - accuracyX[i]);
-            if (accuracyX[i] > q || (((-1) * accuracyX[i]) > q))
-            {
-                er2 /= accuracyX[i]<0? accuracyX[i]*(-1): accuracyX[i];
-            }
-            if (Er2 < er2 || Er2>10)
-            {
-                Er2 = er2;
-            }
-        }
-        meanRatioRelativeAccuracy = Er2;
-        if (illConditionedMatrices)
-        {
-            Er2 = 11;
-            for (size_t i = 0; i < N; i++)
-            {
-                double erLU = (solutionForAccuracyLUX[i] - accuracyX[i]) < 0 ? (solutionForAccuracyLUX[i] * (-1) + accuracyX[i]) : (solutionForAccuracyLUX[i] - accuracyX[i]);
-                if (accuracyX[i] > q || (((-1) * accuracyX[i]) > q))
-                {
-                    erLU /= accuracyX[i] < 0 ? accuracyX[i] * (-1) : accuracyX[i];
-                }
-                if (Er2 < erLU || Er2>10)
-                {
-                    Er2 = erLU;
-                }
-            }
-            meanRatioRelativeAccuracyIllConditionedMatrices = Er2;
+            throw std::runtime_error( "Error in getXSolution(): " + std::string(e.what()));
         }
     }
 
@@ -635,10 +525,87 @@ private:
         }
         catch (const std::exception& e)
         {
-            std::cerr << "Error in checkSolution(): " << e.what() << std::endl;
+            throw std::runtime_error( "Error in checkSolution(): " + std::string(e.what()));
             return false;
         }
        
+    }
+
+    void getMeanRatioRelativeAccuracyBySolution()
+    {
+        double Er2 = 11;
+        for (size_t i = 0; i < N; i++)
+        {
+            double er2 = (solutionForAccuracyX[i] - accuracyX[i]) < 0 ? (solutionForAccuracyX[i] * (-1) + accuracyX[i]) : (solutionForAccuracyX[i] - accuracyX[i]);
+            if ((accuracyX[i] > q || (((-1) * accuracyX[i]) > q))&& accuracyX[i] != 0)
+            {
+                er2 /= accuracyX[i]<0? accuracyX[i]*(-1): accuracyX[i];
+            }
+            if (Er2 < er2 || Er2>10)
+            {
+                Er2 = er2;
+            }
+        }
+        meanRatioRelativeAccuracy = Er2;
+        if (illConditionedMatrices)
+        {
+            Er2 = 11;
+            for (size_t i = 0; i < N; i++)
+            {
+                double erLU = (solutionForAccuracyLUX[i] - accuracyX[i]) < 0 ? (solutionForAccuracyLUX[i] * (-1) + accuracyX[i]) : (solutionForAccuracyLUX[i] - accuracyX[i]);
+                if ((accuracyX[i] > q || (((-1) * accuracyX[i]) > q)) && accuracyX[i] != 0)
+                {
+                    erLU /= accuracyX[i] < 0 ? accuracyX[i] * (-1) : accuracyX[i];
+                }
+                if (Er2 < erLU || Er2>10)
+                {
+                    Er2 = erLU;
+                }
+            }
+            meanRatioRelativeAccuracyIllConditionedMatrices = Er2;
+        }
+    }
+
+    void getAccuracyF()
+    {
+        try
+        {
+            double sum = 0;
+            int count = L - 1;
+            for (size_t i = 0; i < N; i++)
+            {
+                sum = 0;
+                if (count < 2 * L - 1 && i < L)
+                {
+                    ++count;
+                }
+                else if (i > N - L && N != L)
+                {
+                    --count;
+                }
+                for (size_t j = 0; j < count && j < N; j++)
+                {
+                    if (i < L)
+                    {
+                        ////int xIndex = j < N ? j : N - 1;
+                        //int ii = 2 * L - 1 - count + j;
+                        //double xx = accuracyX[j];
+                        //double xxM = matrixCopy[i][2 * L - 1 - count + j];
+                        sum += accuracyX[j] * matrixCopy[i][2 * L - 1 - count + j];
+                    }
+                    else
+                    {
+                        sum += accuracyX[i - L + 1 + j] * matrixCopy[i][j];
+                    }
+                }
+                accuracyF[i] = sum;
+            }
+        }
+        catch (const std::exception& e)
+        {
+            throw std::runtime_error( "Error in checkSolution(): " + std::string(e.what()));
+        }
+
     }
     void getAccuracyLUF()
     {
@@ -690,7 +657,7 @@ private:
         }
         catch (const std::exception& e)
         {
-            std::cerr << "Error in getXSolution(): " << e.what() << std::endl;
+            throw std::runtime_error( "Error in getXSolution(): " + std::string(e.what()));
         }
     }
 };

@@ -44,9 +44,9 @@ void testTwo()
     std::cout << std::endl << std::string(70, '-') << std::endl;
     std::cout << std::setw(5) << "Test" << std::setw(10) << "Size" << std::setw(25) << "Mean relative accuracy" << std::endl;
     std::cout << std::string(70, '-') << std::endl;
-
+    int testNumber = 1;
     for (int i = 0; i < numTests; ++i) {
-        for (int j = 0; j < countTests; j++)
+        for (int j = 0; j < countTests; ++j, ++testNumber)
         {
             int N = sizes[i];
             int L = N;
@@ -58,7 +58,7 @@ void testTwo()
                 lenta = new TapeMatrix(rangeMin, rangeMax, N, L);
             }
             double E = lenta->getMeanRatioRelativeAccuracy();
-            std::cout << std::setw(5) << i + 1 << std::setw(10) << N << std::setw(15) << std::scientific << std::setprecision(2) << E << std::endl;
+            std::cout << std::setw(5) << testNumber << std::setw(10) << N << std::setw(15) << std::scientific << std::setprecision(2) << E << std::endl;
         }
     }
 }
@@ -75,7 +75,8 @@ void testThree()
     std::cout << std::setw(5) << "Test" << std::setw(10) << "Size" << std::setw(17) << "Grade k" << std::setw(27) << "Mean relative accuracy" << std::endl;
     std::cout << std::string(70, '-') << std::endl;
 
-        for (int j = 0; j < numK; j++)
+    
+        for (int j = 0; j < numK; ++j)
         {
             int N = sizes[0];
             int L = N;
@@ -88,7 +89,7 @@ void testThree()
                 lenta = new TapeMatrix(rangeMin, rangeMax, N, L, true, k);
             }
             double E = lenta->getMeanRatioRelativeAccuracyIllConditionedMatrices();
-            std::cout << std::setw(5) << j + 1 << std::setw(10) << N << std::setw(13) << k << std::scientific << std::setprecision(2) << std::setw(20) << E << std::endl;
+            std::cout << std::setw(5) << j+1 << std::setw(10) << N << std::setw(13) << k << std::scientific << std::setprecision(2) << std::setw(20) << E << std::endl;
         }
     
 }
