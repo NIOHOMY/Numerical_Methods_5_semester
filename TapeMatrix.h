@@ -24,7 +24,7 @@ private:
     std::vector<double> x;
     std::vector<double> f;
 
-    double q = 0.0000001;
+    double q = 0.000000001;
     std::vector<double> accuracyX;
     std::vector<double> solutionForAccuracyX;
     std::vector<double> accuracyF;
@@ -160,7 +160,7 @@ public:
                 accuracyMatrixLU[N - 1][2 * L - 2] = 0;
                 for (size_t i = 0; i < N; i++)
                 {
-                    accuracyMatrixLU[i][L - 1] *= roundError(std::pow(10, -k));
+                    accuracyMatrixLU[i][L - 1] *= (std::pow(10, -k));
                 }
                 //PrintAccuracyLUMatrix();
                 getAccuracyLUF();
@@ -324,16 +324,14 @@ private:
                     newLeftLine = i + k;
                     newLeftCol = new_v;
                     sum = 0;
-                    for (size_t j = 0; j < L - 1; j++)
+                    while ((newUpLine >= 0 && newUpLine < N) && newUpCol >= 0 && newUpCol <= 2 * L - 2 && newLeftLine >= 0 && newLeftLine < N && newLeftCol >= 0 && newLeftCol <= 2 * L - 2)
                     {
-                        if ((newUpLine >= 0 && newUpLine < N) && newUpCol >= 0 && newUpCol <= 2 * L - 2 && newLeftLine >= 0 && newLeftLine < N && newLeftCol >= 0 && newLeftCol <= 2 * L - 2)
-                        {
-                            sum += (matrix[newUpLine][newUpCol] * matrix[newLeftLine][newLeftCol]);
-                            newUpLine -= 1;
-                            newUpCol += 1;
-                            newLeftCol -= 1;
-                        }
+                        sum += (matrix[newUpLine][newUpCol] * matrix[newLeftLine][newLeftCol]);
+                        newUpLine -= 1;
+                        newUpCol += 1;
+                        newLeftCol -= 1;
                     }
+                    
                     if (i + k >= 0 && i + k < N && new_v + 1 >= 0 && new_v + 1 < 2 * L - 1)
                     {
                         matrix[i + k][new_v + 1] -= sum;
@@ -350,16 +348,12 @@ private:
                     newLeftLine = i;
                     newLeftCol = L - 2;
                     sum = 0;
-                    for (size_t j = 0; j < L - 1; j++)
+                    while ((newUpLine >= 0 && newUpLine < N) && newUpCol >= 0 && newUpCol <= 2 * L - 2 && newLeftLine >= 0 && newLeftLine < N && newLeftCol >= 0 && newLeftCol <= 2 * L - 2)
                     {
-                        if ((newUpLine >= 0 && newUpLine < N) && newUpCol >= 0 && newUpCol <= 2 * L - 2 && newLeftLine >= 0 && newLeftLine < N && newLeftCol >= 0 && newLeftCol <= 2 * L - 2)
-                        {
-                            sum += (matrix[newUpLine][newUpCol] * matrix[newLeftLine][newLeftCol]);
-                            newUpLine -= 1;
-                            newUpCol += 1;
-                            newLeftCol -= 1;
-                        }
-
+                        sum += (matrix[newUpLine][newUpCol] * matrix[newLeftLine][newLeftCol]);
+                        newUpLine -= 1;
+                        newUpCol += 1;
+                        newLeftCol -= 1;
                     }
                     if (matrix[i][L - 1] != 0)
                     {
@@ -587,10 +581,6 @@ private:
                 {
                     if (i < L)
                     {
-                        ////int xIndex = j < N ? j : N - 1;
-                        //int ii = 2 * L - 1 - count + j;
-                        //double xx = accuracyX[j];
-                        //double xxM = matrixCopy[i][2 * L - 1 - count + j];
                         sum += accuracyX[j] * matrixCopy[i][2 * L - 1 - count + j];
                     }
                     else
