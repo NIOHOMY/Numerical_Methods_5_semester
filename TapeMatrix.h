@@ -257,6 +257,11 @@ public:
     std::vector<double> getAccuracyX() const {
         return solved ? accuracyX : std::vector<double>();
     }
+    
+    std::vector<double> getSolutionForAccuracyX() const {
+        return solved ? solutionForAccuracyX : std::vector<double>();
+    }
+
     std::vector<double> getAccuracyF() const {
         return accuracyF;
     }

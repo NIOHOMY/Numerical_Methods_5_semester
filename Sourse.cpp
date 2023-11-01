@@ -12,7 +12,7 @@ int main() {
     
     /*
     int N = 10; // Размер обычной матрицы
-    int L = 10; // Половина ширины ленты
+    int L = 3; // Половина ширины ленты
     */
 
     //std::string filename = "matrix.txt";
@@ -27,6 +27,8 @@ int main() {
     {
         printArr(lenta.getLUMatrixTape(), lenta.getN(), 2*lenta.getL()-1);
         printArr(lenta.getSolution(), lenta.getN());
+        printArr(lenta.getAccuracyX(), lenta.getN());
+        printArr(lenta.getSolutionForAccuracyX(), lenta.getN());
         double E = lenta.getMeanRatioRelativeAccuracy();
         std::cout << std::scientific << "E: " << std::setprecision(2) << E << std::endl;
     }
@@ -45,8 +47,8 @@ int main() {
         double E = lentaTest3.getMeanRatioRelativeAccuracyIllConditionedMatrices();
         std::cout << std::scientific << "E: " << std::setprecision(2) << E << std::endl;
     }
-    
     */
+    
     testOne();
     testTwo();
     testThree();
