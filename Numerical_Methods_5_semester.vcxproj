@@ -129,6 +129,10 @@
   <ItemGroup>
     <ClCompile Include="Sourse.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="GeneratorSymmetricMatrixWithEigenVectorsAndValues.h" />
+    <ClInclude Include="MethodInverseIterations.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

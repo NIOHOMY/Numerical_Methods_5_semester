@@ -1,20 +1,41 @@
-// Numerical_Methods_5_semester.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
+#pragma once
 
+#include "GeneratorSymmetricMatrixWithEigenVectorsAndValues.h"
 #include <iostream>
 
+
+void printMatrix(const std::vector<std::vector<double>>& matrix) {
+    for (const auto& row : matrix) {
+        for (double element : row) {
+            std::cout << element << " ";
+        }
+        std::cout << std::endl;
+    }
+}
+void printVector(const std::vector<double>& vector) {
+    for (const auto& element : vector) {
+        std::cout << element << std::endl;
+    }
+}
 int main()
 {
-    std::cout << "Hello World!\n";
+    GeneratorSymmetricMatrixWithEigenVectorsAndValues* generator = new GeneratorSymmetricMatrixWithEigenVectorsAndValues(3, 1, 10);
+    std::vector<std::vector<double>> symmetricMatrix = generator->getSymmetricMatrix();
+    std::vector<std::vector<double>> eigenVectors = generator->getEigenVectorsData();
+    std::vector<std::vector<double>> IeigenVectors = generator->getInverseveEigenVectorsData();
+    std::vector<double> eigenValues = generator->getEigenValuesData();
+
+    std::cout <<"-----------------" << std::endl;
+    printMatrix(symmetricMatrix);
+    std::cout <<"-----------------" << std::endl;
+    printMatrix(eigenVectors);
+    std::cout <<"-----------------" << std::endl;
+    /*printMatrix(IeigenVectors);
+    std::cout <<"-----------------" << std::endl;*/
+    printVector(eigenValues);
+    std::cout <<"-----------------" << std::endl;
+
+    return 0;
 }
 
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
 
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
