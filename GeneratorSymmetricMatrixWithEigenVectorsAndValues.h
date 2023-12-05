@@ -1,8 +1,10 @@
 ﻿#pragma once
 
+
 #include <iostream>
 #include <vector>
 #include <random>
+#include <algorithm>
 
 class GeneratorSymmetricMatrixWithEigenVectorsAndValues {
 private:
@@ -31,7 +33,7 @@ public:
                 _eigenVectorsData[i][j] = dis(gen);
             }
         }
-
+        std::sort(_eigenValuesData.begin(), _eigenValuesData.end());
         for (int i = 0; i < _size; ++i)
         {
             for (int j = 0; j < _size; ++j)

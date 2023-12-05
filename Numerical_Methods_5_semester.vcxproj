@@ -127,11 +127,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="functions.cpp" />
     <ClCompile Include="Sourse.cpp" />
+    <ClCompile Include="TestE.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="functions.h" />
     <ClInclude Include="GeneratorSymmetricMatrixWithEigenVectorsAndValues.h" />
     <ClInclude Include="MethodInverseIterations.h" />
+    <ClInclude Include="TapeMatrix.h" />
+    <ClInclude Include="TestE.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
