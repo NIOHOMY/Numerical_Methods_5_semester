@@ -22,7 +22,7 @@ int main()
 {
     SetConsoleOutputCP(CP_UTF8);
     SetConsoleCP(CP_UTF8);
-    int size = 3;
+    int size = 2;
     GeneratorSymmetricMatrixWithEigenVectorsAndValues* generator = new GeneratorSymmetricMatrixWithEigenVectorsAndValues(size, 1, 10);
     std::vector<std::vector<double>> symmetricMatrix = generator->getSymmetricMatrix();
     std::vector<std::vector<double>> eigenVectors = generator->getEigenVectorsData();
@@ -46,20 +46,23 @@ int main()
     /*printMatrix(IeigenVectors);
     std::cout <<"-----------------" << std::endl;*/
     
-    //MethodInverseIterations* finder = new MethodInverseIterations(size, symmetricMatrix, first, eigenValues[0], 0.001, 0.001, 10);
+    MethodInverseIterations* finder = new MethodInverseIterations(size, symmetricMatrix, 0.0000001, 0.0000001, 100);
+    /*
     symmetricMatrix = {
         {1,3},
         {3,1}
     };
-    first = { -1, 1 };
-    MethodInverseIterations* finder = new MethodInverseIterations(2, symmetricMatrix, first, -2.0, 0.001, 0.001, 10);
+    MethodInverseIterations* finder = new MethodInverseIterations(size, symmetricMatrix, 0.0000001, 0.0000001, 100);
+    */
 
     finder->Solve();
 
-    std::cout <<"------Second-vector----------" << std::endl;
-    printArr(finder->getEigenVectorBySecondMinEigenValue(), size-1);
-    std::cout <<"------Secon-min-value----------" << std::endl;
-    std::cout << finder->getSecondMinEigenValue();
+    std::cout <<"-------vector----------" << std::endl;
+    printArr(finder->getEigenVectorBySecondMinEigenValue(), size);
+    std::cout <<"-------min-value-------" << std::endl;
+    std::cout << finder->getSecondMinEigenValue() << std::endl;
+    std::cout <<"----------r----------" << std::endl;
+    std::cout << finder->getR() << std::endl;
     std::cout <<"-----------------" << std::endl;
 
     return 0;

@@ -33,7 +33,9 @@ public:
                 _eigenVectorsData[i][j] = dis(gen);
             }
         }
+        //_eigenVectorsData = { {-1,1},{1,1} };
         std::sort(_eigenValuesData.begin(), _eigenValuesData.end());
+        //_eigenValuesData = { -2,4 };
         for (int i = 0; i < _size; ++i)
         {
             for (int j = 0; j < _size; ++j)
