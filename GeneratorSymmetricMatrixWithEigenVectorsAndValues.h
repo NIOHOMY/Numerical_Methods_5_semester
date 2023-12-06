@@ -4,7 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <random>
-#include <algorithm>
+//#include <algorithm>
 
 class GeneratorSymmetricMatrixWithEigenVectorsAndValues {
 private:
@@ -15,27 +15,29 @@ private:
 
     std::vector<std::vector<double>> _symmetricMatrix;
 public:
-    GeneratorSymmetricMatrixWithEigenVectorsAndValues(int size, double min, double max) : 
+    GeneratorSymmetricMatrixWithEigenVectorsAndValues(int size, double min, double max, double lambdaMin=0, double lambdaMax=0) :
         _size(size), 
         _eigenVectorsData(size, std::vector<double>(size)), 
         _eigenValuesData(size), 
         _inverseEigenVectorsData(size, std::vector<double>(size)),
         _symmetricMatrix(size, std::vector<double>(size))
     {
+        lambdaMin = lambdaMin == 0 && lambdaMin != min ? min : lambdaMin;
+        lambdaMax = lambdaMax == 0 && lambdaMax != max ? max : lambdaMax;
         std::random_device rd;
         std::mt19937 gen(rd());
-        std::uniform_int_distribution<> dis(min, max);
-        //std::uniform_real_distribution<> dis(min, max);
+        //std::uniform_int_distribution<> dis(min, max);
+        //std::uniform_int_distribution<> lambdaDis(lambdaMin, lambdaMax);
+        std::uniform_real_distribution<> dis(min, max);
+        std::uniform_real_distribution<> lambdaDis(lambdaMin, lambdaMax);
 
         for (int i = 0; i < _size; ++i) {
-            _eigenValuesData[i] = dis(gen);
+            _eigenValuesData[i] = lambdaDis(gen);
             for (int j = 0; j < _size; ++j) {
                 _eigenVectorsData[i][j] = dis(gen);
             }
         }
-        //_eigenVectorsData = { {-1,1},{1,1} };
-        std::sort(_eigenValuesData.begin(), _eigenValuesData.end());
-        //_eigenValuesData = { -2,4 };
+        
         for (int i = 0; i < _size; ++i)
         {
             for (int j = 0; j < _size; ++j)
@@ -87,7 +89,8 @@ private:
     std::vector<std::vector<double>> inverseMatrix(const std::vector<std::vector<double>>& A) {
         int n = A.size();
 
-        // Создаем расширенную матрицу [A | I], где I - единичная матрица
+        //  метод Гаусса-Жордана
+        //  [A | I] I - единичная матрица
         std::vector<std::vector<double>> augmentedMatrix(n, std::vector<double>(2 * n, 0.0));
         for (int i = 0; i < n; ++i) {
             for (int j = 0; j < n; ++j) {
@@ -96,15 +99,11 @@ private:
             augmentedMatrix[i][i + n] = 1.0;
         }
 
-        // Применяем метод Гаусса-Жордана для приведения левой части матрицы к единичной форме
         for (int i = 0; i < n; ++i) {
-            // Делим текущую строку на диагональный элемент
             double pivot = augmentedMatrix[i][i];
             for (int j = 0; j < 2 * n; ++j) {
                 augmentedMatrix[i][j] /= pivot;
             }
-
-            // Вычитаем текущую строку из остальных строк с коэффициентами, чтобы получить нули под диагональю
             for (int j = 0; j < n; ++j) {
                 if (j != i) {
                     double factor = augmentedMatrix[j][i];
@@ -114,8 +113,6 @@ private:
                 }
             }
         }
-
-        // Извлекаем обратную матрицу из правой части расширенной матрицы
         std::vector<std::vector<double>> inverse(n, std::vector<double>(n, 0.0));
         for (int i = 0; i < n; ++i) {
             for (int j = 0; j < n; ++j) {

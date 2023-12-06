@@ -9,52 +9,51 @@
 class MethodInverseIterations{
 private:
     // in
+    
     int _size;
     std::vector<std::vector<double>> _symmetricMatrix;
-    std::vector<double> _eigenVectorByFirstMinEigenValue;
-    double _firstMinEigenValue;
-
-    double _eigenVectorsE;
-    double _eigenValuesE;
+    
+    double _givenEigenVectorsE;
+    double _givenEigenValuesE;
     int _maxIterationsNumber;
+    
     // out
-    double _secondMinEigenValue;
-    std::vector<double> _eigenVectorBySecondMinEigenValue;
+    double _firstMinEigenValue;
+    std::vector<double> _eigenVectorByFirstMinEigenValue;
     int _IterationsNumber;
+    double _resultedEigenVectorsE=0;
+    double _resultedEigenValuesE=0;
     double r=10;
 public:
 
-    std::vector<double> getEigenVectorBySecondMinEigenValue() { return _eigenVectorBySecondMinEigenValue; }
-    double getSecondMinEigenValue() { return _secondMinEigenValue; }
+    std::vector<double> getEigenVectorByFirstMinEigenValue() { return _eigenVectorByFirstMinEigenValue; }
+    double getFirstMinEigenValue() { return _firstMinEigenValue; }
+    double getIterationsNumber() { return _IterationsNumber; }
     double getR() { return r; }
+    double getResultedEigenVectorsE() { return _resultedEigenVectorsE; }
+    double getResultedEigenValuesE() { return _resultedEigenValuesE; }
 
     MethodInverseIterations(int size,
         std::vector<std::vector<double>> symmetricMatrix,
-        //std::vector<double> eigenVectorByFirstMinEigenValue,
-        //double firstMinEigenValue,
         double eigenVectorsE,
         double eigenValuesE,
         int maxIterationsNumber):
         _size(size),
-        //_firstMinEigenValue(firstMinEigenValue),
 
-        _eigenValuesE(eigenValuesE), 
-        _eigenVectorsE(eigenVectorsE),
+        _givenEigenValuesE(eigenValuesE), 
+        _givenEigenVectorsE(eigenVectorsE),
         
         _maxIterationsNumber(maxIterationsNumber),
 
-        //_eigenVectorBySecondMinEigenValue(size),
         _eigenVectorByFirstMinEigenValue(size),
 
         _symmetricMatrix(size, std::vector<double>(size))
     {
         _symmetricMatrix = symmetricMatrix;
-        //_eigenVectorByFirstMinEigenValue = eigenVectorByFirstMinEigenValue;
     }
 
     void Solve()
     {
-        //std::vector<double> x_next = _eigenVectorByFirstMinEigenValue;
         std::vector<double> x_rand(_size);
         for (size_t i = 0; i < _size; i++)
         {
@@ -64,7 +63,7 @@ public:
         double q = 10;
         double qPrev = 0;
         double maxVecE = 10;
-        while ((std::abs(std::abs(q) - std::abs(qPrev) > _eigenValuesE) || (std::abs(maxVecE) > _eigenVectorsE)) && k <  _maxIterationsNumber)
+        while ((( _resultedEigenValuesE > _givenEigenValuesE) || (std::abs(maxVecE) > _givenEigenVectorsE)) && k <  _maxIterationsNumber)
         {
             std::vector<double> v = normalizeVector(x_rand);
 
@@ -84,29 +83,33 @@ public:
                 {
                     q += v[i] * x_rand[i];
                 }
-                _secondMinEigenValue = 1 / q;
+                _firstMinEigenValue = 1 / q;
                 //std::cout << "2 q:\n"<< q<<'\n';
-                //std::cout << "value:\n"<< _secondMinEigenValue << '\n';
+                //std::cout << "value:\n"<< _firstMinEigenValue << '\n';
                 maxVecE = 10;
-                for (size_t i = 0; i < _size && !_eigenVectorBySecondMinEigenValue.empty(); i++)
+                for (size_t i = 0; i < _size && !_eigenVectorByFirstMinEigenValue.empty(); i++)
                 {
-                    if (maxVecE> std::abs(v[i])-std::abs(_eigenVectorBySecondMinEigenValue[i]))
+                    double tmp = std::abs(std::abs(v[i]) - std::abs(_eigenVectorByFirstMinEigenValue[i]));
+                    if (maxVecE> tmp)
                     {
-                        maxVecE = std::abs(v[i]) - std::abs(_eigenVectorBySecondMinEigenValue[i]);
+                        maxVecE = tmp;
                     }
                 }
-                _eigenVectorBySecondMinEigenValue = v;
+                _resultedEigenVectorsE = maxVecE;
+                _resultedEigenValuesE = std::abs(std::abs(q) - std::abs(qPrev));
+                _eigenVectorByFirstMinEigenValue = v;
             }
             ++k;
         }
+        _IterationsNumber = k;
         std::vector<double> _R(_size);
         for (size_t i = 0; i < _size; i++)
         {
             for (size_t j = 0; j < _size; j++)
             {
-                _R[i] += _symmetricMatrix[i][j] * _eigenVectorBySecondMinEigenValue[j];
+                _R[i] += _symmetricMatrix[i][j] * _eigenVectorByFirstMinEigenValue[j];
             }
-            _R[i] -= _eigenVectorBySecondMinEigenValue[i] * _secondMinEigenValue;
+            _R[i] -= _eigenVectorByFirstMinEigenValue[i] * _firstMinEigenValue;
             if (_R[i]<r)
             {
                 r = _R[i];
