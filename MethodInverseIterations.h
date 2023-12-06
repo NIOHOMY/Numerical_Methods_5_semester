@@ -18,6 +18,7 @@ private:
     int _maxIterationsNumber;
     
     // out
+
     double _firstMinEigenValue;
     std::vector<double> _eigenVectorByFirstMinEigenValue;
     int _IterationsNumber;
@@ -63,14 +64,14 @@ public:
         double q = 10;
         double qPrev = 0;
         double maxVecE = 10;
-        while ((( _resultedEigenValuesE > _givenEigenValuesE) || (std::abs(maxVecE) > _givenEigenVectorsE)) && k <  _maxIterationsNumber)
+        TapeMatrix* system = new TapeMatrix(_symmetricMatrix, _size, _size);
+        while ((( _resultedEigenValuesE > _givenEigenValuesE) || (std::abs(maxVecE) > _givenEigenVectorsE)) && (k <  _maxIterationsNumber))
         {
             std::vector<double> v = normalizeVector(x_rand);
 
             //std::cout << "Vk:\n";
             //printArr(v, _size);
-            TapeMatrix* system = new TapeMatrix(_symmetricMatrix, _size, _size, v);
-            system->solveSLAE();
+            system->solveSLAE(v);
             if (system->isSolved())
             {
                 x_rand = system->getSolution();

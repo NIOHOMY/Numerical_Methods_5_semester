@@ -34,9 +34,11 @@ private:
     std::vector<double> solutionForAccuracyLUX;
     double meanRatioRelativeAccuracyIllConditionedMatrices = 0.0;
 
+    bool isThereLU = false;
+
 public:
 
-    TapeMatrix(std::vector<std::vector<double>> _matrix, int n, int l, std::vector<double> _f) : N(n), L(l) {
+    TapeMatrix(std::vector<std::vector<double>> _matrix, int n, int l) : N(n), L(l) {
         try {
             matrix.resize(N, std::vector<double>(2 * L - 1));
             matrix.reserve(N);
@@ -49,11 +51,13 @@ public:
             accuracyF.resize(N); accuracyF.reserve(N);
             solutionForAccuracyX.resize(N); solutionForAccuracyX.reserve(N);
             
+            
 
             for (int i = 0; i < N; ++i) {
                 matrix[i].reserve(2 * L - 1);
                 matrixCopy[i].reserve(2 * L - 1);
                 accuracyX[i] = 1;
+                f[i] = generateRandomNumber(-10, 10);
                 for (int j = 0; j < N; ++j) {
                     
                     int new_col = j - i + L - 1;
@@ -67,8 +71,7 @@ public:
             matrix[N - 1][2 * L - 2] = 0;
             matrixCopy[N - 1][2 * L - 2] = 0;
 
-            f.resize(N); f.reserve(N);
-            f = _f;
+            
 
             getAccuracyF();
         }
@@ -324,10 +327,20 @@ public:
     }
 
 
-    void solveSLAE() {
-
-        if (getLUMatrix())
+    void solveSLAE(std::vector<double> _f = {}) {
+        if (!_f.empty())
+            f = _f;
+        if (!isThereLU)
+        {
+            if (getLUMatrix())
+            {
+                isThereLU = true;
+                getXSolution();
+            }
+        }
+        else {
             getXSolution();
+        }
 
         if (checkSolution())
         {

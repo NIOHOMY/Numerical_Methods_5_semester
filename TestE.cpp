@@ -53,19 +53,8 @@ void testOne()
 
                     GeneratorSymmetricMatrixWithEigenVectorsAndValues* generator = new GeneratorSymmetricMatrixWithEigenVectorsAndValues(N, -100, 100, -lambda, lambda);
                     std::vector<std::vector<double>> symmetricMatrix = generator->getSymmetricMatrix();
-                    /*
-                    std::vector<std::vector<double>> eigenVectors = generator->getEigenVectorsData();
-                    std::vector<std::vector<double>> IeigenVectors = generator->getInverseveEigenVectorsData();
-                    std::vector<double> eigenValues = generator->getEigenValuesData();
-
-                    std::cout << "-------symmetricMatrix----------" << std::endl;
-                    printArr(symmetricMatrix, N, N);
-                    std::cout << "-------eigenVectors----------" << std::endl;
-                    printArr(eigenVectors, N, N);
-                    std::cout << "------eigenValues-----------" << std::endl;
-                    printArr(eigenValues, N);
-                    std::cout << "-----------------" << std::endl;
-                    */
+                    
+                    
 
                     MethodInverseIterations* finder = new MethodInverseIterations(N, symmetricMatrix, std::pow(10, E), std::pow(10, E), 1000);
                     finder->Solve();
@@ -79,21 +68,34 @@ void testOne()
                     averageR += r;
                     averageIterationsNumber += IterationsNumber;
 
-                    /*
-                    std::cout << "-------vector----------" << std::endl;
-                    printArr(finder->getEigenVectorByFirstMinEigenValue(), N);
-                    std::cout << "-------min-value-------" << std::endl;
-                    std::cout << finder->getFirstMinEigenValue() << std::endl;
-                    std::cout << "----------r----------" << std::endl;
-                    std::cout << std::scientific << finder->getR() << std::endl;
-                    std::cout << "----------E-vec----------" << std::endl;
-                    std::cout << std::scientific << finder->getResultedEigenVectorsE() << std::endl;
-                    std::cout << "----------E-val---------" << std::endl;
-                    std::cout << std::scientific << finder->getResultedEigenValuesE() << std::endl;
-                    std::cout << "-----------------" << std::endl;
-                    */
                     if (i == averageTests-1)
                     {
+                        /*
+                        std::vector<std::vector<double>> eigenVectors = generator->getEigenVectorsData();
+                        std::vector<double> eigenValues = generator->getEigenValuesData();
+                        std::vector<std::vector<double>> IeigenVectors = generator->getInverseveEigenVectorsData();
+
+                        std::cout << "-------symmetricMatrix----------" << std::endl;
+                        printArr(symmetricMatrix, N, N);
+                        std::cout << "-------eigenVectors----------" << std::endl;
+                        printArr(eigenVectors, N, N);
+                        std::cout << "------eigenValues-----------" << std::endl;
+                        printArr(eigenValues, N);
+                        std::cout << "-----------------" << std::endl;
+                        */
+                        /*
+                        std::cout << "-------vector----------" << std::endl;
+                        printArr(finder->getEigenVectorByFirstMinEigenValue(), N);
+                        std::cout << "-------min-value-------" << std::endl;
+                        std::cout << finder->getFirstMinEigenValue() << std::endl;
+                        std::cout << "----------r----------" << std::endl;
+                        std::cout << std::scientific << finder->getR() << std::endl;
+                        std::cout << "----------E-vec----------" << std::endl;
+                        std::cout << std::scientific << finder->getResultedEigenVectorsE() << std::endl;
+                        std::cout << "----------E-val---------" << std::endl;
+                        std::cout << std::scientific << finder->getResultedEigenValuesE() << std::endl;
+                        std::cout << "-----------------" << std::endl;
+                        */
                         averageEVec /= averageTests;
                         averageEVal /= averageTests;
                         averageR /= averageTests;
