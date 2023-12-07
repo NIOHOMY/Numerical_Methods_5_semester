@@ -43,10 +43,10 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="report.odt">
+    <None Include="..\..\..\report.odt">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="report.pdf">
+    <None Include="..\..\..\report.pdf">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

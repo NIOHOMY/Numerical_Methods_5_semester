@@ -139,8 +139,8 @@
     <ClInclude Include="TestE.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="report.odt" />
-    <None Include="report.pdf" />
+    <None Include="..\..\..\report.odt" />
+    <None Include="..\..\..\report.pdf" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

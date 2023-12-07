@@ -49,6 +49,7 @@ public:
         _inverseEigenVectorsData = inverseMatrix(_eigenVectorsData);
 
         _symmetricMatrix = multiply(_symmetricMatrix, _inverseEigenVectorsData, _size);
+        
     }
 
     std::vector<std::vector<double>> getSymmetricMatrix()
@@ -121,5 +122,21 @@ private:
         }
 
         return inverse;
+    }
+
+    std::vector<double> normalizeVector(const std::vector<double>& vector) {
+        double sum = 0.0;
+        for (double element : vector) {
+            sum += element * element;
+        }
+
+        double magnitude = std::sqrt(sum);
+
+        std::vector<double> normalizedVector;
+        for (double element : vector) {
+            normalizedVector.push_back(element / magnitude);
+        }
+
+        return normalizedVector;
     }
 };

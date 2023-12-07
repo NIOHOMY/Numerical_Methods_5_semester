@@ -70,22 +70,22 @@ void testOne()
 
                     if (i == averageTests-1)
                     {
-                        /*
+                        /*std::cout << "-------vector----------" << std::endl;
+                        printArr(finder->getEigenVectorByFirstMinEigenValue(), N);
                         std::vector<std::vector<double>> eigenVectors = generator->getEigenVectorsData();
-                        std::vector<double> eigenValues = generator->getEigenValuesData();
                         std::vector<std::vector<double>> IeigenVectors = generator->getInverseveEigenVectorsData();
 
+                        std::cout << "-------eigenVectors----------" << std::endl;
+                        printArr(eigenVectors, N, N);*/
+
+                        /*
                         std::cout << "-------symmetricMatrix----------" << std::endl;
                         printArr(symmetricMatrix, N, N);
-                        std::cout << "-------eigenVectors----------" << std::endl;
-                        printArr(eigenVectors, N, N);
+                        std::vector<double> eigenValues = generator->getEigenValuesData();
                         std::cout << "------eigenValues-----------" << std::endl;
                         printArr(eigenValues, N);
                         std::cout << "-----------------" << std::endl;
-                        */
-                        /*
-                        std::cout << "-------vector----------" << std::endl;
-                        printArr(finder->getEigenVectorByFirstMinEigenValue(), N);
+                        
                         std::cout << "-------min-value-------" << std::endl;
                         std::cout << finder->getFirstMinEigenValue() << std::endl;
                         std::cout << "----------r----------" << std::endl;
