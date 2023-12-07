@@ -18,5 +18,36 @@
     <ClCompile Include="Sourse.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="functions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TestE.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="functions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratorSymmetricMatrixWithEigenVectorsAndValues.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MethodInverseIterations.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TapeMatrix.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TestE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="report.odt">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="report.pdf">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
