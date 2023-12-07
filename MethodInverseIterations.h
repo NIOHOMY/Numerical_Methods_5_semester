@@ -65,7 +65,7 @@ public:
         double qPrev = 0;
         double maxVecE = 10;
         TapeMatrix* system = new TapeMatrix(_symmetricMatrix, _size, _size);
-        while ((( _resultedEigenValuesE > _givenEigenValuesE) || (std::abs(maxVecE) > _givenEigenVectorsE)) && (k <  _maxIterationsNumber))
+        while ((( _resultedEigenValuesE > _givenEigenValuesE) || (maxVecE > _givenEigenVectorsE)) && (k <  _maxIterationsNumber))
         {
             std::vector<double> v = normalizeVector(x_rand);
 
@@ -87,11 +87,11 @@ public:
                 _firstMinEigenValue = 1 / q;
                 //std::cout << "2 q:\n"<< q<<'\n';
                 //std::cout << "value:\n"<< _firstMinEigenValue << '\n';
-                maxVecE = 10;
+                maxVecE = -10;
                 for (size_t i = 0; i < _size && !_eigenVectorByFirstMinEigenValue.empty(); i++)
                 {
                     double tmp = std::abs(std::abs(v[i]) - std::abs(_eigenVectorByFirstMinEigenValue[i]));
-                    if (maxVecE> tmp)
+                    if (maxVecE < tmp)
                     {
                         maxVecE = tmp;
                     }
