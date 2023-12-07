@@ -1,4 +1,4 @@
-[full report](.report.pdf)
+[report](report.pdf)
 
 # Numerical_Methods_5_semester
 
