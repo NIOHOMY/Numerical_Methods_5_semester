@@ -1,3 +1,5 @@
+[report](отчёт_3_курс_62_группа_1_подгруппа_ПахомоваПВ.pdf)
+
 # Numerical_Methods_5_semester
 
   *branch lab1*
