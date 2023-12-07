@@ -1,3 +1,5 @@
+![image](https://github.com/NIOHOMY/Numerical_Methods_56_semester/raw/lab2/report.pdf)
+
 # Numerical_Methods_5_semester
 
 **Тема:**
