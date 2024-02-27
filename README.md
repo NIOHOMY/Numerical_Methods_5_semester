@@ -12,7 +12,7 @@
 
 Применение точных методов решения систем линейных алгебраических уравнений. Метод Халецкого решения СЛАУ с ленточными матрицами
 
-[Перейти к лаболаторной 1](https://github.com/NIOHOMY/Numerical_Methods_5_semester/tree/lab2)
+[Перейти к лаболаторной 2](https://github.com/NIOHOMY/Numerical_Methods_5_semester/tree/lab2)
 
 ##
 
@@ -30,6 +30,6 @@
 </p>
 
 
-[Перейти к лаболаторной 1](https://github.com/NIOHOMY/Numerical_Methods_5_semester/tree/lab3)
+[Перейти к лаболаторной 3](https://github.com/NIOHOMY/Numerical_Methods_5_semester/tree/lab3)
 
 ##
