@@ -4,7 +4,9 @@
 
 Решение системы линейных уравнений с разреженными матрицами специального вида
 
-[Перейти к лаболаторной 1](https://github.com/NIOHOMY/Numerical_Methods_5_semester/tree/lab1)
+<div align="center">
+  <a href="https://github.com/NIOHOMY/Numerical_Methods_5_semester/tree/lab1">Перейти к лабораторной 1</a>
+</div>
 
 ##
 
@@ -12,7 +14,9 @@
 
 Применение точных методов решения систем линейных алгебраических уравнений. Метод Халецкого решения СЛАУ с ленточными матрицами
 
-[Перейти к лаболаторной 2](https://github.com/NIOHOMY/Numerical_Methods_5_semester/tree/lab2)
+<div align="center">
+  <a href="https://github.com/NIOHOMY/Numerical_Methods_5_semester/tree/lab2">Перейти к лабораторной 2</a>
+</div>
 
 ##
 
@@ -30,6 +34,8 @@
 </p>
 
 
-[Перейти к лаболаторной 3](https://github.com/NIOHOMY/Numerical_Methods_5_semester/tree/lab3)
+<div align="center">
+  <a href="https://github.com/NIOHOMY/Numerical_Methods_5_semester/tree/lab3">Перейти к лабораторной 3</a>
+</div>
 
 ##
